@@ -41,9 +41,25 @@ angular.module('jsonFunc', [])
             }
           });
 
-          $scope.$watch('selected_func', function() {
-            $scope.column.selected_func = json_from_hash($scope.selected_func);
-          }, true);
+        }
+
+        $scope.$watch('selected_func', function() {
+          $scope.column.selected_func = json_from_hash($scope.selected_func);
+        }, true);
+
+        $scope.remove_blanks = function(values) {
+          return _.compact(values).concat(['']);
+        };
+
+        $scope.remove_blanks_from_hash = function(arg) {
+          var new_values = [];
+          _.each(arg.keys, function(key, index) {
+            if(_.identity(key)) {
+              new_values.push(arg.values[index] || "");
+            }
+          });
+          arg.keys = _.compact(arg.keys).concat(['']);
+          arg.values = new_values;
         };
       },
     };
