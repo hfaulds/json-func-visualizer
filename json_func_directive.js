@@ -8,7 +8,7 @@ angular.module('jsonFunc', [])
         column: '@',
       },
       link: function($scope) {
-        $scope.json_from_hash = function(func) {
+        var json_from_hash = function(func) {
           if(func && func.args) {
             var arg_values = _.map(func.args, function(arg) {
               if(typeof arg === 'object') {
@@ -42,7 +42,7 @@ angular.module('jsonFunc', [])
 
           $scope.selected_func = func;
           $scope.$watch('selected_func', function() {
-            $scope.column.selected_func = $scope.json_from_hash($scope.selected_func);
+            $scope.column.selected_func = json_from_hash($scope.selected_func);
           }, true);
         };
       },
