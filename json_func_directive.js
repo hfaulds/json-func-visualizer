@@ -4,19 +4,20 @@ angular.module('jsonFunc', [])
       restrict: 'E',
       templateUrl: 'func_template.html',
       scope: {
-        valid_functions: '=',
-        column: '@',
+        raw_data_columns: '=rawDataColumns',
+        valid_functions: '=validFunctions',
+        column: '=',
       },
       link: function($scope) {
         var json_from_hash = function(func) {
           if(func && func.args) {
             var arg_values = _.map(func.args, function(arg) {
-              if(typeof arg === 'object') {
-                return _.object(_.compact(arg.keys), arg.values);
-              } else if(arg[0] === 'list') {
-                return ['list'].concat(_.compact(arg.values));
-              } else {
+              if(arg.value) {
                 return arg.value;
+              } else if(arg.keys) {
+                return _.object(_.compact(arg.keys), arg.values);
+              } else {
+                return ['list'].concat(_.compact(arg.values));
               }
             })
             var json = [func.name].concat(arg_values);
@@ -27,20 +28,19 @@ angular.module('jsonFunc', [])
 
         if($scope.column.persisted_func) {
           var arr = JSON.parse($scope.column.persisted_func);
-          var func = _.findWhere($scope.valid_functions, {name: arr[0]});
+          $scope.selected_func = _.findWhere($scope.valid_functions, {name: arr[0]});
 
           _.each(_.rest(arr, 1), function(arg, i) {
             if(typeof arg === 'object') {
-              func.args[i].keys = _.keys(arg);
-              func.args[i].values = _.values(arg);
+              $scope.selected_func.args[i].keys = _.keys(arg);
+              $scope.selected_func.args[i].values = _.values(arg);
             } else if(arg[0] === 'list') {
-              func.args[i].values = arg;
+              $scope.selected_func.args[i].values = arg;
             } else {
-              func.args[i].value = arg;
+              $scope.selected_func.args[i].value = arg;
             }
           });
 
-          $scope.selected_func = func;
           $scope.$watch('selected_func', function() {
             $scope.column.selected_func = json_from_hash($scope.selected_func);
           }, true);
