@@ -4,12 +4,12 @@ angular.module('jsonFunc', [])
       restrict: 'E',
       templateUrl: 'func_template.html',
       scope: {
-        raw_data_columns: '=rawDataColumns',
         valid_functions: '=validFunctions',
         column: '=',
+        extras: '=',
       },
       link: function($scope) {
-        var json_from_hash = function(func) {
+        function json_from_hash(func) {
           if(func && func.args) {
             var arg_values = _.map(func.args, function(arg) {
               if(arg.value) {
@@ -31,36 +31,23 @@ angular.module('jsonFunc', [])
           $scope.selected_func = _.findWhere($scope.valid_functions, {name: arr[0]});
 
           _.each(_.rest(arr, 1), function(arg, i) {
-            if(typeof arg === 'object') {
+            if(arg[0] === 'list') {
+              $scope.selected_func.args[i].values = _.rest(arg, 1);
+            } else if(typeof arg === 'object') {
               $scope.selected_func.args[i].keys = _.keys(arg);
               $scope.selected_func.args[i].values = _.values(arg);
-            } else if(arg[0] === 'list') {
-              $scope.selected_func.args[i].values = arg;
             } else {
               $scope.selected_func.args[i].value = arg;
             }
           });
-
         }
 
         $scope.$watch('selected_func', function() {
           $scope.column.selected_func = json_from_hash($scope.selected_func);
+          if($scope.extras && $scope.extras.onchange) {
+            $scope.extras.onchange(column);
+          }
         }, true);
-
-        $scope.remove_blanks = function(values) {
-          return _.compact(values).concat(['']);
-        };
-
-        $scope.remove_blanks_from_hash = function(arg) {
-          var new_values = [];
-          _.each(arg.keys, function(key, index) {
-            if(_.identity(key)) {
-              new_values.push(arg.values[index] || "");
-            }
-          });
-          arg.keys = _.compact(arg.keys).concat(['']);
-          arg.values = new_values;
-        };
       },
     };
   })
