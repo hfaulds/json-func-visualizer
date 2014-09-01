@@ -56,7 +56,7 @@ angular.module('jsonFunc', [])
         $scope.$watch('selected_func', function() {
           $scope.column.selected_func = json_from_hash($scope.selected_func);
           if($scope.extras && $scope.extras.onchange) {
-            $scope.extras.onchange(column);
+            $scope.extras.onchange($scope.column);
           }
         }, true);
       },
