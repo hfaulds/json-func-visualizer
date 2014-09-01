@@ -16,8 +16,10 @@ angular.module('jsonFunc', [])
                 return arg.value;
               } else if(arg.keys) {
                 return _.object(_.compact(arg.keys), arg.values);
-              } else {
+              } else if(arg.values && _.compact(arg.values).length > 0) {
                 return ['list'].concat(_.compact(arg.values));
+              } else {
+                return null;
               }
             })
             var json = [func.name].concat(arg_values);
@@ -32,10 +34,19 @@ angular.module('jsonFunc', [])
 
           _.each(_.rest(arr, 1), function(arg, i) {
             if(arg[0] === 'list') {
-              $scope.selected_func.args[i].values = _.rest(arg, 1);
+              var values = _.rest(arg, 1);
+              values.push('');
+
+              $scope.selected_func.args[i].values = values;
             } else if(typeof arg === 'object') {
-              $scope.selected_func.args[i].keys = _.keys(arg);
-              $scope.selected_func.args[i].values = _.values(arg);
+              var keys = _.keys(arg);
+              keys.push('');
+
+              var values = _.values(arg);
+              values.push('');
+
+              $scope.selected_func.args[i].keys = keys;
+              $scope.selected_func.args[i].values = values;
             } else {
               $scope.selected_func.args[i].value = arg;
             }
